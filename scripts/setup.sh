@@ -24,6 +24,9 @@ if ! wp core is-installed >/dev/null 2>&1; then
 		--skip-email
 fi
 
+echo "→ Removing default plugins (Akismet, Hello Dolly)"
+wp plugin delete akismet hello >/dev/null 2>&1 || true
+
 echo "→ Installing pinned plugins (plugins.txt)"
 { grep -Ev '^[[:space:]]*(#|$)' plugins.txt || true; } | while read -r slug version; do
 	if [ -z "${version:-}" ]; then
@@ -32,6 +35,8 @@ echo "→ Installing pinned plugins (plugins.txt)"
 	fi
 	wp plugin install "$slug" --version="$version" --activate --force </dev/null
 done
+
+
 
 echo "→ Activating project theme and plugin"
 wp theme activate my-project
