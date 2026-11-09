@@ -15,7 +15,7 @@ SSH_PORT="${SSH_PORT:-22}"
 remote() { ssh -n -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "cd '$WP_PATH' && $*"; }
 
 echo "→ Installing pinned plugins"
-grep -Ev '^[[:space:]]*(#|$)' plugins.txt | while read -r slug version; do
+{ grep -Ev '^[[:space:]]*(#|$)' plugins.txt || true; } | while read -r slug version; do
 	[ -n "${version:-}" ] || { echo "✗ $slug is not pinned" >&2; exit 1; }
 	remote wp plugin install "$slug" --version="$version" --activate
 done

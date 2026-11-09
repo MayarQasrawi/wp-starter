@@ -25,7 +25,7 @@ if ! wp core is-installed >/dev/null 2>&1; then
 fi
 
 echo "→ Installing pinned plugins (plugins.txt)"
-grep -Ev '^[[:space:]]*(#|$)' plugins.txt | while read -r slug version; do
+{ grep -Ev '^[[:space:]]*(#|$)' plugins.txt || true; } | while read -r slug version; do
 	if [ -z "${version:-}" ]; then
 		echo "✗ $slug has no version in plugins.txt. Pin it." >&2
 		exit 1

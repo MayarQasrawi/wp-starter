@@ -15,7 +15,7 @@ SNAKE="${SLUG//-/_}"
 UPPER="$(echo "$SNAKE" | tr '[:lower:]' '[:upper:]')"
 
 echo "→ Replacing names in files"
-grep -rlI --exclude-dir=.git --exclude=new-project.sh -e 'my-project' -e 'my_project' -e 'MY_PROJECT' -e 'My Project' . |
+{ grep -rlI --exclude-dir=.git --exclude=new-project.sh -e 'my-project' -e 'my_project' -e 'MY_PROJECT' -e 'My Project' . || true; } |
 	while read -r file; do
 		SLUG="$SLUG" SNAKE="$SNAKE" UPPER="$UPPER" TITLE="$TITLE" perl -pi -e '
 			s/MY_PROJECT/$ENV{UPPER}/g;
