@@ -4,15 +4,39 @@ WordPress site: block theme + custom plugin, Docker for local, GitHub Actions fo
 
 ## Start a new project from this starter
 
+Click **Use this template** on GitHub to create the new repo, then:
+
+```bash
+git clone https://github.com/<you>/acme-shop.git
+cd acme-shop
+./scripts/new-project.sh acme-shop "Acme Shop"   # renames theme, plugin, prefixes
+./scripts/setup.sh
+git add -A && git commit -m "Rename starter to acme-shop"
+git push
+```
+
+Git is already connected to the new repo, so the push is a normal fast-forward.
+
+The first push does not deploy until the server variables are set (see [Deploy](#deploy)).
+
+**Fallback, no GitHub repo yet:** clone the starter and start a fresh history.
+
 ```bash
 git clone https://github.com/MayarQasrawi/wp-starter.git acme-shop
 cd acme-shop
-rm -rf .git && git init
-./scripts/new-project.sh acme-shop "Acme Shop"   # renames theme, plugin, prefixes
+rm -rf .git && git init -b main
+./scripts/new-project.sh acme-shop "Acme Shop"
 ./scripts/setup.sh
 ```
 
-Or click **Use this template** on GitHub, clone your new repo, then run the last two lines.
+Then create the GitHub repo **empty** (no README, license or .gitignore) and push:
+
+```bash
+git add -A && git commit -m "Initial commit" &&
+git remote add origin <url> && git push -u origin main
+```
+
+> **Never mix the two paths.** A fresh `git init` pushed to a template-created repo gives unrelated histories and forces a force-push.
 
 ## Run locally
 
@@ -53,6 +77,8 @@ Change the port with `WP_PORT=8095 ./scripts/setup.sh`.
 ## Deploy
 
 Push to `main` → PHP lint → DB backup on the server (last 5 kept) → rsync theme and plugin → cache flush.
+
+Until `SSH_HOST` is set, the deploy job skips its steps with a notice and still passes; lint runs as usual.
 
 **One-time setup**
 
