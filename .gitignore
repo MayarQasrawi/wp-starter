@@ -1,0 +1,26 @@
+# Root-anchored where it matters (a leading / means "repo root only").
+
+# Secrets and local config
+/.env
+/.env.*
+!/.env.example
+/.local/
+wp-config.php
+
+# Data that belongs to the server, not git
+*.sql
+*.sql.gz
+/backups/
+uploads/
+
+# Large design exports: keep in shared storage, not in the repo
+/design/
+
+# Tooling and OS noise
+node_modules/
+vendor/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

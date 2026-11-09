@@ -1,0 +1,7 @@
+# Keep Unix line endings so scripts run in Docker and on Linux servers,
+# even when the repo is cloned on Windows.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary

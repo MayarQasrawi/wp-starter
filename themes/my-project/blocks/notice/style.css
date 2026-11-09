@@ -1,0 +1,5 @@
+.my-project-notice {
+	padding: 1rem 1.25rem;
+	border-inline-start: 4px solid var(--wp--preset--color--accent);
+	background: var(--wp--preset--color--muted);
+}

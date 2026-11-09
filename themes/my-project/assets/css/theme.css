@@ -1,0 +1,11 @@
+/* Hand-written styles. Loaded on the front end and in the editor. */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}

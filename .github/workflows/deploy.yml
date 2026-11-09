@@ -1,0 +1,67 @@
+# Deploy on push to main: lint → back up DB → rsync code → flush caches.
+# Never writes to the database. Content is managed in WP Admin.
+#
+# Repo (or "production" environment) settings:
+#   Variables: SSH_HOST, SSH_PORT, SSH_USER, WP_PATH, PHP_VERSION, CACHE_PURGE_CMD (optional)
+#   Secrets:   SSH_KEY, SSH_KNOWN_HOSTS
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "themes/**"
+      - "plugins/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  THEME: my-project
+  PLUGINS: my-project-core # space-separated if you add more
+
+jobs:
+  check:
+    uses: ./.github/workflows/check.yml
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SSH_HOST: ${{ vars.SSH_HOST }}
+      SSH_PORT: ${{ vars.SSH_PORT || '22' }}
+      SSH_USER: ${{ vars.SSH_USER }}
+      WP_PATH: ${{ vars.WP_PATH }}
+      CACHE_PURGE_CMD: ${{ vars.CACHE_PURGE_CMD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_deploy
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
+          echo "SSH=ssh -i $HOME/.ssh/id_deploy -p $SSH_PORT" >> "$GITHUB_ENV"
+
+      - name: Back up database (keeps the last 5)
+        run: |
+          STAMP=$(date +%Y%m%d-%H%M%S)
+          $SSH "$SSH_USER@$SSH_HOST" "mkdir -p ~/backups && cd '$WP_PATH' \
+            && wp db export - | gzip > ~/backups/db-$STAMP.sql.gz \
+            && ls -1t ~/backups/db-*.sql.gz | tail -n +6 | xargs -r rm --"
+
+      - name: Sync theme and plugins
+        run: |
+          rsync -rlz --delete -e "$SSH" "themes/$THEME/" "$SSH_USER@$SSH_HOST:$WP_PATH/wp-content/themes/$THEME/"
+          for plugin in $PLUGINS; do
+            rsync -rlz --delete -e "$SSH" "plugins/$plugin/" "$SSH_USER@$SSH_HOST:$WP_PATH/wp-content/plugins/$plugin/"
+          done
+
+      - name: Flush caches
+        run: |
+          $SSH "$SSH_USER@$SSH_HOST" "cd '$WP_PATH' && wp cache flush ${CACHE_PURGE_CMD:+&& $CACHE_PURGE_CMD}"

@@ -1,0 +1,7 @@
+# Third-party plugins, pinned. One per line: <slug> <version>
+# Used by scripts/setup.sh (local) and scripts/server-setup.sh (server),
+# so local and live always run the same versions.
+#
+# Examples:
+# woocommerce 9.4.2
+# contact-form-7 6.0.1

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# WP-CLI through the cli container. Usage: ./scripts/wp plugin list
+set -euo pipefail
+export MSYS_NO_PATHCONV=1 # stop Git Bash on Windows from rewriting /var/www paths
+cd "$(dirname "$0")/.."
+if [ -t 0 ] && [ -t 1 ]; then
+	exec docker compose run --rm cli wp "$@"
+else
+	exec docker compose run --rm -T cli wp "$@"
+fi

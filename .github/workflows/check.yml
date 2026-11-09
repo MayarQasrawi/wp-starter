@@ -1,0 +1,20 @@
+# PHP syntax check. Runs on every pull request and before every deploy.
+name: Check
+
+on:
+  pull_request:
+  workflow_call:
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ vars.PHP_VERSION || '8.3' }} # set PHP_VERSION to the server's version
+          coverage: none
+
+      - name: php -l on all project PHP
+        run: find themes plugins seed tests -name '*.php' -print0 | xargs -0 -n1 php -l

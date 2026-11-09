@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "my-project/notice",
+	"version": "0.1.0",
+	"title": "Notice",
+	"category": "theme",
+	"icon": "info",
+	"description": "A short highlighted message. Example dynamic block.",
+	"textdomain": "my-project",
+	"attributes": {
+		"message": { "type": "string", "default": "Hello from My Project." }
+	},
+	"supports": { "html": false, "align": ["wide", "full"] },
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}
